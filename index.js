@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const composeRoutes = require('./app/tooling/route-composer');
+const composeRoutes = require('./app/routes/route-composer');
 
 app.get('/', (req, res) => {
     res.send('Server is running!');
