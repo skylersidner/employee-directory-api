@@ -4,7 +4,8 @@
   "description": "API for the Employee Directory web app",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "NODE_ENV=dev nodemon index.js",
+    "prod": "NODE_ENV=prod node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Skyler Sidner",
