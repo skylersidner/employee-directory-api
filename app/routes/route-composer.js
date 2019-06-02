@@ -4,8 +4,6 @@ const fs = require('fs');
 const composeRoutes = (app) => {
   // root is relative to the context of this method being invoked (in index.js)...
   fs.readdir('./app/routes', (err, files) => {
-    console.log('err: ', err);
-
     const routeFiles = files.filter(fileName => fileName.includes('.routes.js'));
 
     routeFiles.forEach(fileName => {
