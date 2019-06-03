@@ -1,4 +1,4 @@
-const {remove} = require('lodash');
+const {assignWith} = require('lodash');
 
 const employeesStub = require('../stubs/employees.stub');
 const Employee = require('../models/employee.model');
@@ -45,10 +45,12 @@ const routes = (app) => {
       if (!currentEmployee) {
         response = {errors: [`Item with ID ${updatedEmployee.id} could not be found.`]}
       } else {
-        //TODO: fix this to be safe for static properties like ID, dateAdded, etc.
 
-        remove(employees, emp => emp.id === updatedEmployee.id);
-        employees.push(updatedEmployee);
+        const customizer = (objValue, srcValue, key, object, source) => {
+          return (key === 'id' || key === 'dateAdded') ? objValue : srcValue;
+        };
+
+        assignWith(currentEmployee, updatedEmployee, customizer);
         response = employees.find(emp => emp.id === updatedEmployee.id);
       }
     } else {
