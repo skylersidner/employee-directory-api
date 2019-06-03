@@ -3,14 +3,14 @@ const employees = [{
   imageUrl: '',
   firstName: 'John',
   lastName: 'Doe',
-  dateAdded: new Date(),
+  dateAdded: new Date().getTime(),
   title: 'CEO'
 },{
   id: 'da43bfcf-2f80-45ec-a63c-47178be727af',
   imageUrl: '',
   firstName: 'Jane',
   lastName: 'Johnson',
-  dateAdded: new Date(),
+  dateAdded: new Date().getTime(),
   title: 'CTO'
 }];
 
