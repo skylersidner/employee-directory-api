@@ -1,3 +1,5 @@
+const {remove} = require('lodash');
+
 const employeesStub = require('../stubs/employees.stub');
 const Employee = require('../models/employee.model');
 
@@ -5,30 +7,56 @@ let employees = [];
 
 const routes = (app) => {
 
-    const employeesPath = '/employees';
+  const employeesPath = '/employees';
 
-    if (process.env.NODE_ENV === 'dev') {
-        employees = employeesStub;
+  if (process.env.NODE_ENV === 'dev') {
+    employees = employeesStub;
+  }
+
+  app.get(employeesPath, (req, res) => {
+    res.send(employees)
+  });
+
+  app.post(employeesPath, (req, res) => {
+    const validation = Employee.validatePost(req.body);
+
+    let response;
+
+    if (validation.isValid) {
+      const newEmployee = new Employee(req.body);
+      employees.push(newEmployee);
+      response = employees;
+    } else {
+      response = {errors: validation.errors};
     }
 
-    app.get(employeesPath, (req, res) => {
-        res.send(employees)
-    });
+    res.send(response);
+  });
 
-    app.post(employeesPath, (req, res) => {
-        const newEmployee = new Employee(req.body);
+  app.put(employeesPath, (req, res) => {
+    const updatedEmployee = req.body;
 
-        const validation = Employee.validate(req.body);
-        let response;
-        if (validation.isValid) {
-            employees.push(newEmployee);
-            response = employees;
-        } else {
-            response = { errors: validation.errors };
-        }
+    const validation = Employee.validatePut(updatedEmployee);
+    let response;
 
-        res.send(response);
-    });
+    if (validation.isValid) {
+      const currentEmployee = employees.find(emp => emp.id === updatedEmployee.id);
+
+      if (!currentEmployee) {
+        response = {errors: [`Item with ID ${updatedEmployee.id} could not be found.`]}
+      } else {
+        //TODO: fix this to be safe for static properties like ID, dateAdded, etc.
+
+        remove(employees, emp => emp.id === updatedEmployee.id);
+        employees.push(updatedEmployee);
+        response = employees.find(emp => emp.id === updatedEmployee.id);
+      }
+    } else {
+      response = {errors: validation.errors};
+    }
+
+    res.send(response)
+  });
 };
 
 module.exports = routes;
