@@ -8,8 +8,12 @@ const composeRoutes = require('./app/routes/route-composer');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(cors());
-// app.options('*', cors());
+
+const corsOptions = {
+    origin: 'http://localhost:4200' //TODO: set this up with configuration; origin can be a function
+};
+app.use(cors(corsOptions));
+
 
 app.get('/', (req, res) => {
     res.send('Server is running!');

@@ -2,6 +2,7 @@ const {assignWith} = require('lodash');
 
 const employeesStub = require('../stubs/employees.stub');
 const Employee = require('../models/employee.model');
+const ErrorHandler = require('./error-handler');
 
 let employees = [];
 
@@ -13,67 +14,68 @@ const routes = (app) => {
     employees = employeesStub;
   }
 
-  app.get(employeesPath, (req, res) => {
-    res.send(employees)
+  app.get(employeesPath, (request, response) => {
+    response.send(employees)
   });
 
-  app.post(employeesPath, (req, res) => {
-    const validation = Employee.validatePost(req.body);
+  app.post(employeesPath, (request, response) => {
+    const validation = Employee.validatePost(request.body);
 
-    let response;
+    let result;
 
     if (validation.isValid) {
-      const newEmployee = new Employee(req.body);
+      const newEmployee = new Employee(request.body);
       employees.push(newEmployee);
-      response = employees;
+      result = employees;
     } else {
-      response = {errors: validation.errors};
+      result = { errors: validation.errors };
     }
 
-    res.send(response);
+    response.send(result);
   });
 
-  app.put(`${employeesPath}/:id`, (req, res) => {
-    const updatedEmployee = req.body;
+  app.put(`${employeesPath}/:id`, (request, response) => {
+    const updatedEmployee = request.body;
 
     const validation = Employee.validatePut(updatedEmployee);
-    let response;
+    let result;
 
     if (validation.isValid) {
       const currentEmployee = employees.find(emp => emp.id === updatedEmployee.id);
 
       if (!currentEmployee) {
-        response = { errors: [`Item with ID ${updatedEmployee.id} could not be found.`] }
-      } else if(req.params.id !== currentEmployee.id) {
-        response = { errors: [`ID of ${req.params.id} in request path does not match item in body of ID ${currentEmployee.id}.`]}
+        result = ErrorHandler.NotFound({ response, id: updatedEmployee.id });
+      } else if(request.params.id !== currentEmployee.id) {
+        result = ErrorHandler.BadRequest({ response, requestId: request.params.id, itemId: currentEmployee.id })
       } else {
         const customizer = (objValue, srcValue, key, object, source) => {
           return (key === 'id' || key === 'dateAdded') ? objValue : srcValue;
         };
 
         assignWith(currentEmployee, updatedEmployee, customizer);
-        response = employees.find(emp => emp.id === updatedEmployee.id);
+        result = employees.find(emp => emp.id === updatedEmployee.id);
       }
     } else {
-      response = {errors: validation.errors};
+      result = { errors: validation.errors };
     }
 
-    res.send(response)
+    response.send(result)
   });
 
-  app.delete(`${employeesPath}/:id`, (req, res) => {
-    const idToDelete = req.params.id;
+  app.delete(`${employeesPath}/:id`, (request, response) => {
+    const idToDelete = request.params.id;
 
     const employee = employees.find(emp => emp.id === idToDelete);
+    let result;
 
     if (!employee) {
-      response = { errors: [`Item with ID ${idToDelete} could not be found.`] }
+      result = ErrorHandler.NotFound({ response, id: idToDelete })
     } else {
       employees = employees.filter(emp => emp.id !== idToDelete);
-      response = employee;
+      result = employee;
     }
 
-    res.send(response)
+    response.send(result)
   });
 };
 

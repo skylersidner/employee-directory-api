@@ -70,7 +70,6 @@ class Employee {
     const errors = [];
     let isValid = true;
     const definitions = Employee.AttributeDefinitions();
-    console.log('definitions: ', definitions)
 
     Object.keys(definitions).forEach( key => {
       const definition = definitions[key];
