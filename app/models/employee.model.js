@@ -1,6 +1,6 @@
 const uuidv4 = require('uuid/v4');
 
-const requestTypeEnum = Object.freeze({ POST: 'post', PUT: 'put', PATCH: 'patch' });
+const requestTypeEnum = Object.freeze({ POST: 'post', PUT: 'put', PATCH: 'patch', DELETE: 'delete' });
 
 // based on this article: https://webbjocke.com/javascript-check-data-types/
 const isValidType = (value, type) => {
@@ -42,7 +42,7 @@ class Employee {
       lastName: { type: 'string', required: [ requestTypeEnum.POST, requestTypeEnum.PUT ] },
       dateAdded: { type: 'date', required: [ requestTypeEnum.PUT ] },
       title: { type: 'string', required: [ requestTypeEnum.PUT ] },
-      id: { type: 'string', required: [ requestTypeEnum.PATCH, requestTypeEnum.PUT ]}
+      id: { type: 'string', required: [ requestTypeEnum.PATCH, requestTypeEnum.PUT, requestTypeEnum.DELETE ]}
     };
   }
 
@@ -73,11 +73,8 @@ class Employee {
     console.log('definitions: ', definitions)
 
     Object.keys(definitions).forEach( key => {
-      console.log('key: ', key)
       const definition = definitions[key];
-      console.log('definition: ', definition)
       const value = classObject[key];
-      console.log('value: ', value)
 
       if (definition.required.includes(requestTypeEnum.PUT)
           && (!classObject.hasOwnProperty(key) || value === null || value === undefined)) {
