@@ -18,6 +18,20 @@ const routes = (app) => {
     response.send(employees)
   });
 
+  app.get(`${employeesPath}/:id`, (request, response) => {
+    const id = request.params.id;
+    const employee = employees.find(emp => emp.id === id);
+
+    let result;
+    if (employee) {
+      result = employee;
+    } else {
+      result = ErrorHandler.NotFound({ response, id });
+    }
+
+    response.send(result);
+  });
+
   app.post(employeesPath, (request, response) => {
     const validation = Employee.validatePost(request.body);
 
@@ -54,6 +68,7 @@ const routes = (app) => {
 
         assignWith(currentEmployee, updatedEmployee, customizer);
         result = employees.find(emp => emp.id === updatedEmployee.id);
+        console.log
       }
     } else {
       result = { errors: validation.errors };
